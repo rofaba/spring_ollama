@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <title>Chat IA</title>
-
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -18,41 +17,45 @@
             background: white;
             padding: 30px;
             border-radius: 10px;
-            width: 500px;
+            width: 700px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
 
-        h1 {
-            margin-top: 0;
+        h1, h2 {
             text-align: center;
         }
 
         form {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
         }
 
-        input {
-            flex: 1;
+        input, textarea, select, button {
+            width: 100%;
             padding: 10px;
+            margin-top: 8px;
+            margin-bottom: 12px;
             border-radius: 6px;
             border: 1px solid #ccc;
             font-size: 14px;
+            box-sizing: border-box;
         }
 
         button {
-            padding: 10px 16px;
-            border: none;
             background-color: #2c7be5;
             color: white;
-            border-radius: 6px;
+            border: none;
             cursor: pointer;
-            font-size: 14px;
         }
 
         button:hover {
             background-color: #1a5fd0;
+        }
+
+        .bloque {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
         }
 
         .respuesta {
@@ -60,40 +63,49 @@
             padding: 15px;
             border-radius: 6px;
             border-left: 4px solid #2c7be5;
-        }
-
-        .respuesta h2 {
-            margin-top: 0;
-            font-size: 16px;
+            white-space: pre-wrap;
         }
     </style>
-
 </head>
-
 <body>
 
 <div class="container">
+    <h1>Aplicación IA</h1>
 
-    <h1>Pregunta a la IA</h1>
+    <div class="bloque">
+        <h2>Preguntar a la IA</h2>
 
-    <form th:action="@{/}" method="get">
-        <input
-                id="pregunta"
-                name="pregunta"
-                type="text"
-                placeholder="Escribe tu pregunta..."
-                th:value="${pregunta}"
-                required
-        />
+        <form th:action="@{/preguntar}" th:object="${preguntaForm}" method="post">
+            <input type="text" th:field="*{pregunta}" placeholder="Escribe tu pregunta..." required />
+            <button type="submit">Preguntar</button>
+        </form>
 
-        <button type="submit">Enviar</button>
-    </form>
-
-    <div class="respuesta" th:if="${respuesta}">
-        <h2>Respuesta</h2>
-        <p th:text="${respuesta}"></p>
+        <div class="respuesta"
+             th:if="${preguntaForm.respuesta != null and !#strings.isEmpty(preguntaForm.respuesta)}">
+            <p th:text="${preguntaForm.respuesta}"></p>
+        </div>
     </div>
 
+    <div class="bloque">
+        <h2>Procesar texto</h2>
+
+        <form th:action="@{/procesar}" th:object="${textoForm}" method="post">
+            <textarea th:field="*{texto}" rows="6" placeholder="Escribe o pega un texto..." required></textarea>
+
+            <select th:field="*{accion}">
+                <option value="resumir">Resumir</option>
+                <option value="traducir">Traducir al inglés</option>
+                <option value="corregir">Corregir texto</option>
+            </select>
+
+            <button type="submit">Procesar</button>
+        </form>
+
+        <div class="respuesta"
+             th:if="${textoForm.resultado != null and !#strings.isEmpty(textoForm.resultado)}">
+            <p th:text="${textoForm.resultado}"></p>
+        </div>
+    </div>
 </div>
 
 </body>
