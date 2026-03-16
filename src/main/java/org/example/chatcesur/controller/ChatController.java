@@ -16,12 +16,29 @@ public class ChatController {
     }
 
     @GetMapping("/")
-    public String home(@RequestParam(value = "pregunta", required = false) String pregunta, Model model) {
+    public String home(@RequestParam(value = "pregunta", required = false) String pregunta,
+                       Model model) {
+
         model.addAttribute("pregunta", pregunta == null ? "" : pregunta);
 
         if (pregunta != null && !pregunta.isBlank()) {
-            String respuesta = chatModel.call(pregunta);
-            model.addAttribute("respuesta", respuesta);
+
+            String prompt = """
+                    Responde en HTML limpio y simple, sin incluir <html>, <head> ni <body>.
+                    Usa solo etiquetas seguras y visuales como:
+                    <h3>, <p>, <ul>, <li>, <strong>, <em>, <br>, <code>.
+                    
+                    No uses markdown.
+                    No uses scripts.
+                    No uses estilos inline.
+                    La respuesta debe ser clara, breve y bien estructurada.
+                    
+                    Pregunta del usuario:
+                    """ + pregunta;
+
+            String respuestaHtml = chatModel.call(prompt);
+
+            model.addAttribute("respuesta", respuestaHtml);
         }
 
         return "home";
