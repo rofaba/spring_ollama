@@ -15,9 +15,10 @@
                     linear-gradient(135deg, #1c0f08, #3b1f0f);
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start;
             padding: 30px;
             color: #fff7ed;
+            box-sizing: border-box;
         }
 
         .container {
@@ -31,6 +32,7 @@
                     0 20px 50px rgba(0, 0, 0, 0.35),
                     inset 0 1px 0 rgba(255, 200, 150, 0.06);
             backdrop-filter: blur(10px);
+            box-sizing: border-box;
         }
 
         h1 {
@@ -42,14 +44,31 @@
             color: #ffedd5;
         }
 
+        .seccion-titulo {
+            margin: 0 0 14px 0;
+            font-size: 18px;
+            font-weight: 600;
+            color: #fdba74;
+        }
+
         form {
             display: flex;
             gap: 12px;
             margin-bottom: 22px;
         }
 
-        input {
-            flex: 1;
+        .form-texto {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 22px;
+        }
+
+        input,
+        textarea,
+        select {
+            width: 100%;
+            box-sizing: border-box;
             padding: 14px 16px;
             border-radius: 14px;
             border: 1px solid rgba(255, 180, 120, 0.2);
@@ -57,17 +76,36 @@
             color: #fff7ed;
             font-size: 15px;
             transition: 0.2s ease;
+            font-family: inherit;
         }
 
-        input::placeholder {
+        input::placeholder,
+        textarea::placeholder {
             color: #fdba74;
         }
 
-        input:focus {
+        input:focus,
+        textarea:focus,
+        select:focus {
             outline: none;
             border-color: #fb923c;
             background: rgba(255, 150, 80, 0.12);
             box-shadow: 0 0 0 4px rgba(251, 146, 60, 0.15);
+        }
+
+        textarea {
+            min-height: 160px;
+            resize: vertical;
+            line-height: 1.6;
+        }
+
+        select {
+            cursor: pointer;
+        }
+
+        select option {
+            background: #3b1f0f;
+            color: #fff7ed;
         }
 
         button {
@@ -81,6 +119,7 @@
             cursor: pointer;
             transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
             box-shadow: 0 10px 24px rgba(234, 88, 12, 0.35);
+            align-self: flex-end;
         }
 
         button:hover {
@@ -166,6 +205,18 @@
             color: inherit;
         }
 
+        hr {
+            border: none;
+            height: 1px;
+            background: linear-gradient(
+                    to right,
+                    transparent,
+                    rgba(255, 180, 120, 0.35),
+                    transparent
+            );
+            margin: 30px 0;
+        }
+
         @keyframes aparecer {
             from {
                 opacity: 0;
@@ -177,7 +228,6 @@
             }
         }
     </style>
-
 </head>
 
 <body>
@@ -195,13 +245,37 @@
                 th:value="${pregunta}"
                 required
         />
-
         <button type="submit">Enviar</button>
     </form>
 
     <div class="respuesta" th:if="${respuesta}">
         <h2>Respuesta</h2>
         <div th:utext="${respuesta}"></div>
+    </div>
+
+    <hr>
+
+    <h2 class="seccion-titulo">Procesar texto</h2>
+
+    <form class="form-texto" action="/procesar" method="get">
+        <textarea
+                name="texto"
+                placeholder="Escribe un texto para corregir, resumir o traducir..."
+                required
+                th:text="${texto}"></textarea>
+
+        <select name="accion">
+            <option value="corregir" th:selected="${accion == 'corregir'}">Corregir texto</option>
+            <option value="resumir" th:selected="${accion == 'resumir'}">Resumir texto</option>
+            <option value="traducir" th:selected="${accion == 'traducir'}">Traducir al inglés</option>
+        </select>
+
+        <button type="submit">Procesar</button>
+    </form>
+
+    <div class="respuesta" th:if="${resultadoTexto}">
+        <h2>Resultado</h2>
+        <div th:utext="${resultadoTexto}"></div>
     </div>
 
 </div>
