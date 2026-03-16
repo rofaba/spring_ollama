@@ -1,17 +1,16 @@
 package org.example.chatcesur.model;
 
-
-
-public class TextoForm {
+public class TextoAccionRequest {
 
     private String texto;
     private String accion;
-    private String resultado;
 
-    public TextoForm() {
-        this.texto = "";
-        this.accion = "resumir";
-        this.resultado = "";
+    public TextoAccionRequest() {
+    }
+
+    public TextoAccionRequest(String texto, String accion) {
+        this.texto = texto;
+        this.accion = accion;
     }
 
     public String getTexto() {
@@ -28,13 +27,5 @@ public class TextoForm {
 
     public void setAccion(String accion) {
         this.accion = accion;
-    }
-
-    public String getResultado() {
-        return resultado;
-    }
-
-    public void setResultado(String resultado) {
-        this.resultado = resultado;
     }
 }
