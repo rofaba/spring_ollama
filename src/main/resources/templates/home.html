@@ -5,6 +5,10 @@
     <title>Chat IA</title>
 
     <style>
+        * {
+            box-sizing: border-box;
+        }
+
         body {
             margin: 0;
             min-height: 100vh;
@@ -13,17 +17,22 @@
                     radial-gradient(circle at top left, #7c2d12 0%, transparent 35%),
                     radial-gradient(circle at bottom right, #ea580c 0%, transparent 30%),
                     linear-gradient(135deg, #1c0f08, #3b1f0f);
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
             padding: 30px;
             color: #fff7ed;
-            box-sizing: border-box;
         }
 
-        .container {
+        .layout {
             width: 100%;
-            max-width: 720px;
+            max-width: 1280px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 24px;
+            align-items: start;
+        }
+
+        .container,
+        .panel-lateral {
             background: rgba(35, 16, 8, 0.9);
             border: 1px solid rgba(255, 180, 120, 0.15);
             border-radius: 22px;
@@ -32,7 +41,6 @@
                     0 20px 50px rgba(0, 0, 0, 0.35),
                     inset 0 1px 0 rgba(255, 200, 150, 0.06);
             backdrop-filter: blur(10px);
-            box-sizing: border-box;
         }
 
         h1 {
@@ -55,9 +63,11 @@
             display: flex;
             gap: 12px;
             margin-bottom: 22px;
+            align-items: stretch;
         }
 
-        .form-texto {
+        .form-texto,
+        .form-tabla {
             display: flex;
             flex-direction: column;
             gap: 12px;
@@ -68,7 +78,6 @@
         textarea,
         select {
             width: 100%;
-            box-sizing: border-box;
             padding: 14px 16px;
             border-radius: 14px;
             border: 1px solid rgba(255, 180, 120, 0.2);
@@ -119,7 +128,7 @@
             cursor: pointer;
             transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
             box-shadow: 0 10px 24px rgba(234, 88, 12, 0.35);
-            align-self: flex-end;
+            white-space: nowrap;
         }
 
         button:hover {
@@ -131,6 +140,11 @@
             transform: translateY(0);
         }
 
+        .form-texto button,
+        .form-tabla button {
+            align-self: flex-end;
+        }
+
         .respuesta {
             margin-top: 8px;
             padding: 22px;
@@ -140,6 +154,7 @@
             box-shadow: inset 0 1px 0 rgba(255, 200, 150, 0.05);
             line-height: 1.7;
             animation: aparecer 0.25s ease;
+            overflow-x: auto;
         }
 
         .respuesta h2 {
@@ -217,6 +232,30 @@
             margin: 30px 0;
         }
 
+        .tabla {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            overflow: hidden;
+            border-radius: 12px;
+        }
+
+        .tabla th,
+        .tabla td {
+            padding: 10px 12px;
+            border-bottom: 1px solid rgba(255,180,120,0.2);
+            text-align: center;
+        }
+
+        .tabla th {
+            color: #fdba74;
+            background: rgba(255, 150, 80, 0.08);
+        }
+
+        .tabla tr:hover td {
+            background: rgba(255, 150, 80, 0.05);
+        }
+
         @keyframes aparecer {
             from {
                 opacity: 0;
@@ -227,55 +266,108 @@
                 transform: translateY(0);
             }
         }
+
+        @media (max-width: 980px) {
+            .layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 640px) {
+            body {
+                padding: 16px;
+            }
+
+            .container,
+            .panel-lateral {
+                padding: 20px;
+            }
+
+            form {
+                flex-direction: column;
+            }
+
+            button {
+                width: 100%;
+            }
+
+            .form-texto button,
+            .form-tabla button {
+                align-self: stretch;
+            }
+        }
     </style>
 </head>
 
 <body>
 
-<div class="container">
+<div class="layout">
 
-    <h1>Pregunta a la IA</h1>
+    <div class="container">
 
-    <form th:action="@{/}" method="get">
-        <input
-                id="pregunta"
-                name="pregunta"
-                type="text"
-                placeholder="Escribe tu pregunta..."
-                th:value="${pregunta}"
-                required
-        />
-        <button type="submit">Enviar</button>
-    </form>
+        <h1>Pregunta a la IA</h1>
 
-    <div class="respuesta" th:if="${respuesta}">
-        <h2>Respuesta</h2>
-        <div th:utext="${respuesta}"></div>
+        <form th:action="@{/}" method="get">
+            <input
+                    id="pregunta"
+                    name="pregunta"
+                    type="text"
+                    placeholder="Escribe tu pregunta..."
+                    th:value="${pregunta}"
+                    required
+            />
+            <button type="submit">Enviar</button>
+        </form>
+
+        <div class="respuesta" th:if="${respuesta}">
+            <h2>Respuesta</h2>
+            <div th:utext="${respuesta}"></div>
+        </div>
+
+        <hr>
+
+        <h2 class="seccion-titulo">Procesar texto</h2>
+
+        <form class="form-texto" action="/procesar" method="get">
+            <textarea
+                    name="texto"
+                    placeholder="Escribe un texto para corregir, resumir o traducir..."
+                    required
+                    th:text="${texto}"></textarea>
+
+            <select name="accion">
+                <option value="corregir" th:selected="${accion == 'corregir'}">Corregir texto</option>
+                <option value="resumir" th:selected="${accion == 'resumir'}">Resumir texto</option>
+                <option value="traducir" th:selected="${accion == 'traducir'}">Traducir al inglés</option>
+            </select>
+
+            <button type="submit">Procesar</button>
+        </form>
+
+        <div class="respuesta" th:if="${resultadoTexto}">
+            <h2>Resultado</h2>
+            <div th:utext="${resultadoTexto}"></div>
+        </div>
+
     </div>
 
-    <hr>
+    <div class="panel-lateral">
+        <h2 class="seccion-titulo">Tabla de multiplicar</h2>
 
-    <h2 class="seccion-titulo">Procesar texto</h2>
+        <form class="form-tabla" th:action="@{/tabla/generar}" method="post">
+            <input
+                    type="number"
+                    name="numero"
+                    placeholder="Introduce un número"
+                    th:value="${numeroTabla}"
+                    required
+            />
+            <button type="submit">Generar tabla</button>
+        </form>
 
-    <form class="form-texto" action="/procesar" method="get">
-        <textarea
-                name="texto"
-                placeholder="Escribe un texto para corregir, resumir o traducir..."
-                required
-                th:text="${texto}"></textarea>
-
-        <select name="accion">
-            <option value="corregir" th:selected="${accion == 'corregir'}">Corregir texto</option>
-            <option value="resumir" th:selected="${accion == 'resumir'}">Resumir texto</option>
-            <option value="traducir" th:selected="${accion == 'traducir'}">Traducir al inglés</option>
-        </select>
-
-        <button type="submit">Procesar</button>
-    </form>
-
-    <div class="respuesta" th:if="${resultadoTexto}">
-        <h2>Resultado</h2>
-        <div th:utext="${resultadoTexto}"></div>
+        <div class="respuesta" th:if="${tablaResultado}">
+            <div th:utext="${tablaResultado}"></div>
+        </div>
     </div>
 
 </div>
