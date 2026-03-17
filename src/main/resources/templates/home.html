@@ -373,7 +373,25 @@
 </div>
 
 <hr>
+<hr>
 
+<h2 class="seccion-titulo">Buscar producto en Mongo</h2>
+
+<form class="form-texto" th:action="@{/item/mongo}" method="get">
+    <input
+            type="text"
+            name="id"
+            placeholder="Introduce el id del item en Mongo"
+            th:value="${mongoId}"
+            required
+    />
+
+    <button type="submit">Buscar item</button>
+</form>
+
+<div class="respuesta" th:if="${itemMongoJson}">
+    <div th:utext="${itemMongoJson}"></div>
+</div>
 <hr>
 
 <h2 class="seccion-titulo">Generar producto desde JSON guía</h2>
