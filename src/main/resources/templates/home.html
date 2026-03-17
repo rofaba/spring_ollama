@@ -372,5 +372,22 @@
 
 </div>
 
+<hr>
+
+<h2 class="seccion-titulo">Generar producto desde JSON</h2>
+
+<form class="form-texto" th:action="@{/producto/generar}" method="post">
+    <textarea
+            name="jsonGuia"
+            placeholder="Pega aquí el JSON guía..."
+            required
+            th:text="${jsonGuia}"></textarea>
+
+    <button type="submit">Generar producto</button>
+</form>
+
+<div class="respuesta" th:if="${productoGenerado}">
+    <div th:utext="${productoGenerado}"></div>
+</div>
 </body>
 </html>
