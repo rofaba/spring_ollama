@@ -374,20 +374,46 @@
 
 <hr>
 
-<h2 class="seccion-titulo">Generar producto desde JSON</h2>
+<hr>
 
-<form class="form-texto" th:action="@{/producto/generar}" method="post">
+<h2 class="seccion-titulo">Generar producto desde JSON guía</h2>
+
+<form class="form-texto" th:action="@{/producto/generar-json}" method="post">
     <textarea
             name="jsonGuia"
             placeholder="Pega aquí el JSON guía..."
             required
             th:text="${jsonGuia}"></textarea>
 
-    <button type="submit">Generar producto</button>
+    <button type="submit">Generar producto desde JSON</button>
 </form>
 
-<div class="respuesta" th:if="${productoGenerado}">
-    <div th:utext="${productoGenerado}"></div>
+<div class="respuesta" th:if="${productoGeneradoJson}">
+    <div th:utext="${productoGeneradoJson}"></div>
+</div>
+
+<hr>
+
+<h2 class="seccion-titulo">Generar producto desde modelo + características</h2>
+
+<form class="form-texto" th:action="@{/producto/generar-caracteristicas}" method="post">
+    <textarea
+            name="jsonModelo"
+            placeholder="Pega aquí el JSON modelo..."
+            required
+            th:text="${jsonModelo}"></textarea>
+
+    <textarea
+            name="caracteristicas"
+            placeholder="Describe aquí las características del nuevo producto..."
+            required
+            th:text="${caracteristicas}"></textarea>
+
+    <button type="submit">Generar producto desde características</button>
+</form>
+
+<div class="respuesta" th:if="${productoGeneradoCaracteristicas}">
+    <div th:utext="${productoGeneradoCaracteristicas}"></div>
 </div>
 </body>
 </html>

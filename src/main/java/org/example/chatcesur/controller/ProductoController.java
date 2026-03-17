@@ -15,13 +15,13 @@ public class ProductoController {
         this.chatModel = chatModel;
     }
 
-    @PostMapping("/producto/generar")
-    public String generarProducto(@RequestParam("jsonGuia") String jsonGuia, Model model) {
+    @PostMapping("/producto/generar-json")
+    public String generarDesdeJson(@RequestParam("jsonGuia") String jsonGuia, Model model) {
 
         model.addAttribute("jsonGuia", jsonGuia);
 
         if (jsonGuia == null || jsonGuia.isBlank()) {
-            model.addAttribute("productoGenerado", "<p>Debes introducir un JSON guía.</p>");
+            model.addAttribute("productoGeneradoJson", "<p>Debes introducir un JSON guía.</p>");
             return "home";
         }
 
@@ -35,35 +35,88 @@ public class ProductoController {
                 """ + jsonGuia + """
 
                 TAREA:
-                Crea un producto NUEVO y DIFERENTE que mantenga la misma estructura de llaves (keys)
-                y la misma categoría mencionada arriba.
+                Crea un producto NUEVO y DIFERENTE que mantenga exactamente la misma estructura
+                de llaves del JSON guía.
 
                 REGLAS CRÍTICAS DE FORMATO Y CONTENIDO:
-                1. CATEGORÍA: El nuevo producto debe ser estrictamente de la categoría "electronica".
-                2. COMPLETITUD: Prohibido usar valores null o dejar campos vacíos.
-                3. EAN: Inventa un código EAN válido de 13 dígitos.
-                4. IMAGEN: Usa una URL de imagen realista.
-                5. REALISMO: Los valores de price, rate y count deben ser coherentes.
-                6. SALIDA LIMPIA: Devuelve ÚNICAMENTE el bloque JSON.
-                7. NO uses markdown.
-                8. NO uses bloques de código.
-                9. NO añadas explicaciones antes ni después.
-
-                RESULTADO ESPERADO:
-                Devuelve solo el JSON.
+                1. La categoría debe ser estrictamente "electronica".
+                2. No uses null ni dejes campos vacíos.
+                3. Genera un EAN válido de 13 dígitos.
+                4. Usa una URL de imagen realista.
+                5. Los valores de price, rate y count deben ser coherentes.
+                6. Devuelve ÚNICAMENTE el bloque JSON.
+                7. No uses markdown.
+                8. No uses bloques de código.
+                9. No añadas explicaciones, saludos ni comentarios.
                 """;
 
-        String respuesta = chatModel.call(prompt);
+        String respuesta = limpiarRespuesta(chatModel.call(prompt));
+        model.addAttribute("productoGeneradoJson", formatearComoPre(respuesta));
 
-        String limpio = respuesta
+        return "home";
+    }
+
+    @PostMapping("/producto/generar-caracteristicas")
+    public String generarDesdeCaracteristicas(@RequestParam("jsonModelo") String jsonModelo,
+                                              @RequestParam("caracteristicas") String caracteristicas,
+                                              Model model) {
+
+        model.addAttribute("jsonModelo", jsonModelo);
+        model.addAttribute("caracteristicas", caracteristicas);
+
+        if (jsonModelo == null || jsonModelo.isBlank()) {
+            model.addAttribute("productoGeneradoCaracteristicas", "<p>Debes introducir un JSON modelo.</p>");
+            return "home";
+        }
+
+        if (caracteristicas == null || caracteristicas.isBlank()) {
+            model.addAttribute("productoGeneradoCaracteristicas", "<p>Debes introducir características del producto.</p>");
+            return "home";
+        }
+
+        String prompt = """
+                OBJETIVO: Generar un nuevo objeto JSON a partir de un modelo y de unas características dadas.
+
+                CONTEXTO DE ROL:
+                Actúa como un experto en gestión de inventarios para e-commerce.
+
+                JSON MODELO:
+                """ + jsonModelo + """
+
+                CARACTERÍSTICAS DEL NUEVO PRODUCTO:
+                """ + caracteristicas + """
+
+                TAREA:
+                Genera un producto NUEVO usando exactamente la misma estructura de llaves del JSON modelo,
+                pero adaptando el contenido a las características proporcionadas.
+
+                REGLAS CRÍTICAS DE FORMATO Y CONTENIDO:
+                1. La categoría debe ser estrictamente "electronica".
+                2. No uses null ni dejes campos vacíos.
+                3. Genera un EAN válido de 13 dígitos.
+                4. Usa una URL de imagen realista.
+                5. Los valores de price, rate y count deben ser coherentes con el producto descrito.
+                6. El resultado debe reflejar claramente las características indicadas.
+                7. Devuelve ÚNICAMENTE el bloque JSON.
+                8. No uses markdown.
+                9. No uses bloques de código.
+                10. No añadas explicaciones, saludos ni comentarios.
+                """;
+
+        String respuesta = limpiarRespuesta(chatModel.call(prompt));
+        model.addAttribute("productoGeneradoCaracteristicas", formatearComoPre(respuesta));
+
+        return "home";
+    }
+
+    private String limpiarRespuesta(String texto) {
+        if (texto == null) return "";
+
+        return texto
                 .replace("```json", "")
                 .replace("```JSON", "")
                 .replace("```", "")
                 .trim();
-
-        model.addAttribute("productoGenerado", formatearComoPre(limpio));
-
-        return "home";
     }
 
     private String formatearComoPre(String json) {
